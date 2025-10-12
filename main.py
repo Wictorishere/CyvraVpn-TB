@@ -1,15 +1,41 @@
 from typing import final
-from telegram import Update, KeyboardButton, ReplyKeyboardMarkup
+from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
+from ConfigHandler import create_trial_user_api
+
 TOKEN: final = '7300849904:AAGVUbRVtr9vj6NEgk3kdURCWvgYtWj6SVk'
 BOT_USERNAME: final = '@CyvraVPN_bot'
+CHANNEL_ID = "@CyvraVPN"
 
 
 # ---------------------- دستورات ----------------------
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+
+    try:
+        member = await context.bot.get_chat_member(CHANNEL_ID, user_id)
+        status = member.status
+    except Exception as e:
+        print("Error checking membership:", e)
+        status = None
+
+    if status not in ("member", "administrator", "creator"):
+        keyboard = [
+            [InlineKeyboardButton("📢 عضویت در کانال", url=f"https://t.me/{CHANNEL_ID[1:]}")]
+        ]
+        markup = InlineKeyboardMarkup(keyboard)
+
+        await update.message.reply_text(
+            "⚠️ برای استفاده از ربات باید در کانال ما عضو بشی.\n\n"
+            "بعد از عضویت، دستور /start رو دوباره بزن ✅",
+            reply_markup=markup
+        )
+        return
+
+    # اگر عضو بود، منوی اصلی نمایش داده بشه
     keyboard = [
         [KeyboardButton("🛒 خرید"), KeyboardButton("🧪 تست رایگان")],
         [KeyboardButton("💬 پشتیبانی"), KeyboardButton("ℹ️ راهنما")]
@@ -25,7 +51,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "ℹ️ راهنما و توضیحات سرویس‌ها"
     )
     await update.message.reply_text(text, reply_markup=markup, parse_mode=ParseMode.MARKDOWN)
-
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = (
@@ -51,10 +76,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
     elif text == "🧪 تست رایگان":
-        await update.message.reply_text(
-            "🧪 برای دریافت تست رایگان، لطفاً آی‌دی یا ایمیل خود را ارسال کنید.\n"
-            "مدت زمان تست: ۲۴ ساعت ✅"
-        )
+        await update.message.reply_text("در حال ساخت اکانت تست... لطفاً شکیبا باشید ⏳")
+        user_id = f"tg_{update.effective_user.id}"
+        result = await create_trial_user_api(user_id, hours=24, traffic_bytes=100 * 1024 * 1024)
+        if "error" in result:
+            await update.message.reply_text(f"مشکل در ساخت اکانت تست:\n{result['error']}")
+        else:
+            await update.message.reply_text(f"اکانت تست ساخته شد ✅\n\nلینک اتصال:\n{result['link']}\n\nاعتبار: 24 ساعت")
 
     elif text == "💬 پشتیبانی":
         await update.message.reply_text(
