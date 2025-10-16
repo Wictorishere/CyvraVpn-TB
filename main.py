@@ -166,9 +166,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if text == "🛒 خرید":
         keyboard = [
-            [InlineKeyboardButton("۱ ماهه 10 گیگ – 25 هزار تومان", callback_data="plan_1")],
-            [InlineKeyboardButton("۱ ماهه 20 گیگ – 45 هزار تومان", callback_data="plan_2")],
-            [InlineKeyboardButton( "۱ ماهه نامحدود – 85 هزار تومان", callback_data="plan_3")]
+            [InlineKeyboardButton("۱ ماهه 10 گیگ – 20 هزار تومان", callback_data="plan_1")],
+            [InlineKeyboardButton("۱ ماهه 20 گیگ – 35 هزار تومان", callback_data="plan_2")],
+            [InlineKeyboardButton("۱ ماهه 30 گیگ – 50 هزار تومان", callback_data="plan_3")],
+            [InlineKeyboardButton("۱ ماهه 50 گیگ – 70 هزار تومان", callback_data="plan_4")],
+            [InlineKeyboardButton("۱ ماهه 70 گیگ – 90 هزار تومان", callback_data="plan_5")],
+            [InlineKeyboardButton( "۱ ماهه 100 گیگ – 110 هزار تومان", callback_data="plan_6")]
         ]
         await update.message.reply_text(
             "📦 لطفاً پلن مورد نظر را انتخاب کن:",
@@ -190,9 +193,12 @@ async def plan_selected(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
 
     plan_map = {
-        "plan_1": "۱ ماهه 10 گیگ – 25 هزار تومان",
-        "plan_2": "۱ ماهه 20 گیگ – 45 هزار تومان",
-        "plan_3": "۱ ماهه نامحدود(مصرف منصفانه) – 85 هزار تومان"
+        "plan_1": "۱ ماهه 10 گیگ – 20 هزار تومان",
+        "plan_2": "۱ ماهه 20 گیگ – 35 هزار تومان",
+        "plan_3": "۱ ماهه 30 گیگ  – 50 هزار تومان",
+        "plan_3": "۱ ماهه 50 گیگ  – 70 هزار تومان",
+        "plan_3": "۱ ماهه 70 گیگ  – 90 هزار تومان",
+        "plan_3": "۱ ماهه 100 گیگ  – 110 هزار تومان",
     }
 
     plan = plan_map.get(query.data)
